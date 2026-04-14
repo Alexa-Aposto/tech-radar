@@ -97,8 +97,8 @@ def send_notification(
                 msg["Subject"] = subject
                 msg["From"] = f"Horizon <{config.email_address}>"
                 msg["To"] = recipient
-                msg.attach(MIMEText(text_body, "plain"))
-                msg.attach(MIMEText(html_body, "html"))
+                msg.attach(MIMEText(text_body, "plain", "utf-8"))
+                msg.attach(MIMEText(html_body, "html", "utf-8"))
                 server.send_message(msg)
                 logger.info(f"Notification sent to {recipient}")
         return True
