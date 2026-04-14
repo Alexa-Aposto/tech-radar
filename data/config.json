@@ -2,7 +2,7 @@
   "version": "1.0",
   "ai": {
     "provider": "gemini",
-    "model": "gemini-2.0-flash",
+    "model": "gemini-2.5-flash",
     "api_key_env": "GOOGLE_API_KEY",
     "temperature": 0.3,
     "max_tokens": 8192,
@@ -30,7 +30,7 @@
       {
         "name": "Anthropic News",
         "url": "https://www.anthropic.com/news/rss.xml",
-        "enabled": true,
+        "enabled": false,
         "category": "ai-ml"
       },
       {
@@ -78,7 +78,7 @@
       {
         "name": "Upbound Blog (Crossplane)",
         "url": "https://blog.upbound.io/rss.xml",
-        "enabled": true,
+        "enabled": false,
         "category": "cloud-native"
       },
       {
@@ -90,7 +90,7 @@
       {
         "name": "X/Twitter — AI & K8s List",
         "url": "https://rsshub.app/twitter/list/2044051139583201530",
-        "enabled": true,
+        "enabled": false,
         "category": "social"
       },
       {
