@@ -19,7 +19,7 @@ def _pangu(text: str) -> str:
 
 LABELS = {
     "en": {
-        "header": "Horizon Daily",
+        "header": "Tech Radar",
         "source": "Source",
         "background": "Background",
         "discussion": "Discussion",
@@ -124,6 +124,7 @@ class DailySummarizer:
             or ""
         )
         background = meta.get(f"background_{language}") or meta.get("background") or ""
+        relevance = meta.get("relevance") or ""
         discussion = (
             meta.get(f"community_discussion_{language}")
             or meta.get("community_discussion")
@@ -158,6 +159,10 @@ class DailySummarizer:
             "",
             source_line,
         ]
+
+        if relevance:
+            lines.append("")
+            lines.append(f"**Relevance**: {relevance}")
 
         if background:
             lines.append("")

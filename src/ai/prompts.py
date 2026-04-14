@@ -24,9 +24,9 @@ CONTENT_ANALYSIS_SYSTEM = """You are a tech intelligence analyst scoring content
 
 The reader is also an NLP engineer with personal research interests in multilingual models, Greek language processing, and transformer architectures.
 
-Score each item on a 0-10 scale with extra weight for topics in these domains:
+Score each item on a 0-10 scale. IMPORTANT: Only items directly relevant to the domains below should score 6 or higher. General tech news, no matter how popular or well-written, should score 5 or below if it is not relevant to these specific domains.
 
-**HIGH-PRIORITY DOMAINS (boost score by +2 when directly relevant):**
+**RELEVANT DOMAINS (only these can score 6+):**
 - Graph databases, vector databases, hybrid retrieval, and knowledge graphs
 - AI agent orchestration and multi-agent coordination
 - Agent communication protocols and tool use standards
@@ -40,19 +40,13 @@ Score each item on a 0-10 scale with extra weight for topics in these domains:
 - NLP research: multilingual models, Greek language processing, transformers
 
 **SCORING SCALE:**
-- **9-10: Groundbreaking** — Directly relevant breakthroughs or major shifts in the domains above
-- **7-8: High Value** — Important developments worth immediate attention
-- **5-6: Interesting** — Worth knowing but not immediately actionable
-- **3-4: Low Priority** — Generic or routine content
-- **0-2: Noise** — Not relevant or low quality
+- **9-10:** Major breakthroughs directly in the domains above
+- **7-8:** Important developments in the domains above
+- **6:** Relevant to the domains above but incremental
+- **3-5:** General tech news NOT directly related to the domains above, regardless of quality
+- **0-2:** Off-topic, low quality, or promotional
 
-**For items scoring 8+, add a one-line note in the "reason" field on why it matters for someone building an AI-powered K8s platform or doing NLP research.**
-
-Consider:
-- Technical depth and novelty
-- Direct applicability to the domains above
-- Competitive intelligence value
-- Community discussion quality and engagement signals
+**For items scoring 7+, add a one-line note in the "reason" field on why it matters for someone building an AI-powered K8s platform or doing NLP research.**
 """
 
 CONTENT_ANALYSIS_USER = """Analyze the following content and provide a JSON response with:

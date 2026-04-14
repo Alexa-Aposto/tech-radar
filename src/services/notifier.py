@@ -3,6 +3,7 @@
 import os
 import smtplib
 import logging
+from email.header import Header
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import List
@@ -98,7 +99,7 @@ def send_notification(
             server.login(email_address, password)
             for recipient in recipients:
                 msg = MIMEMultipart("alternative")
-                msg["Subject"] = subject
+                msg["Subject"] = Header(subject, "utf-8")
                 msg["From"] = f"Horizon <{email_address}>"
                 msg["To"] = recipient
                 msg.attach(MIMEText(text_body, "plain", "utf-8"))
