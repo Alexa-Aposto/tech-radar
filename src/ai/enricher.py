@@ -5,6 +5,7 @@ For items that pass the score threshold, this module:
 2. Feeds search results + item content to AI to generate grounded background knowledge
 """
 
+import asyncio
 import json
 import re
 import sys
@@ -29,12 +30,24 @@ class ContentEnricher:
     def __init__(self, ai_client: AIClient):
         self.client = ai_client
 
-    async def enrich_batch(self, items: List[ContentItem]) -> None:
+    async def enrich_batch(self, items: List[ContentItem], max_concurrent: int = 3) -> None:
         """Enrich items in-place with background knowledge.
 
         Args:
             items: Content items to enrich (modified in-place)
+            max_concurrent: Max parallel enrichment tasks (lower than analyze
+                            because each enrichment does web searches + 2 AI calls)
         """
+        semaphore = asyncio.Semaphore(max_concurrent)
+
+        async def _safe_enrich(item: ContentItem) -> None:
+            async with semaphore:
+                try:
+                    await self._enrich_item(item)
+                except Exception as e:
+                    print(f"Error enriching item {item.id}: {e}")
+                progress.advance(task)
+
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
@@ -43,13 +56,7 @@ class ContentEnricher:
             transient=True,
         ) as progress:
             task = progress.add_task("Enriching", total=len(items))
-
-            for item in items:
-                try:
-                    await self._enrich_item(item)
-                except Exception as e:
-                    print(f"Error enriching item {item.id}: {e}")
-                progress.advance(task)
+            await asyncio.gather(*[_safe_enrich(item) for item in items])
 
     async def _web_search(self, query: str, max_results: int = 3) -> list:
         """Search the web for context via DuckDuckGo.
@@ -184,27 +191,30 @@ class ContentEnricher:
             print(f"Warning: could not parse enrichment response for {item.id}, skipping enrichment")
             return
 
-        # Combine structured sub-fields into per-language detailed_summary
-        for lang in ("en", "zh"):
-            if result.get(f"title_{lang}"):
-                val = result[f"title_{lang}"]
-                item.metadata[f"title_{lang}"] = val.get("text") or str(val) if isinstance(val, dict) else str(val)
+        # Extract English fields
+        if result.get("title_en"):
+            val = result["title_en"]
+            item.metadata["title_en"] = val.get("text") or str(val) if isinstance(val, dict) else str(val)
 
-            parts = []
-            for field in ("whats_new", "why_it_matters", "key_details"):
-                text = result.get(f"{field}_{lang}", "").strip()
-                if text:
-                    parts.append(text)
-            if parts:
-                item.metadata[f"detailed_summary_{lang}"] = " ".join(parts)
+        parts = []
+        for field in ("whats_new_en", "why_it_matters_en", "key_details_en"):
+            text = result.get(field, "").strip() if isinstance(result.get(field), str) else ""
+            if text:
+                parts.append(text)
+        if parts:
+            item.metadata["detailed_summary_en"] = " ".join(parts)
 
-            if result.get(f"background_{lang}"):
-                val = result[f"background_{lang}"]
-                item.metadata[f"background_{lang}"] = val.get("text") or str(val) if isinstance(val, dict) else str(val)
+        if result.get("background_en"):
+            val = result["background_en"]
+            item.metadata["background_en"] = val.get("text") or str(val) if isinstance(val, dict) else str(val)
 
-            if result.get(f"community_discussion_{lang}"):
-                val = result[f"community_discussion_{lang}"]
-                item.metadata[f"community_discussion_{lang}"] = val.get("text") or str(val) if isinstance(val, dict) else str(val)
+        if result.get("community_discussion_en"):
+            val = result["community_discussion_en"]
+            item.metadata["community_discussion_en"] = val.get("text") or str(val) if isinstance(val, dict) else str(val)
+
+        if result.get("relevance"):
+            val = result["relevance"]
+            item.metadata["relevance"] = val.get("text") or str(val) if isinstance(val, dict) else str(val)
 
         # Store citation sources — only URLs that actually came from our search results
         if result.get("sources") and available_urls:
@@ -216,7 +226,7 @@ class ContentEnricher:
             if valid:
                 item.metadata["sources"] = valid
 
-        # Backward-compatible fallback fields (English as default)
+        # Backward-compatible fallback fields
         item.metadata["detailed_summary"] = item.metadata.get("detailed_summary_en", "")
         item.metadata["background"] = item.metadata.get("background_en", "")
         item.metadata["community_discussion"] = item.metadata.get("community_discussion_en", "")
