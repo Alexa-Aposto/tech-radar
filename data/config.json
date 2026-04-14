@@ -1,22 +1,140 @@
 {
   "version": "1.0",
   "ai": {
-    "provider": "openai",
-    "model": "deepseek-chat",
-    "base_url": "https://api.deepseek.com",
-    "api_key_env": "OPENAI_API_KEY",
+    "provider": "gemini",
+    "model": "gemini-2.0-flash",
+    "api_key_env": "GOOGLE_API_KEY",
     "temperature": 0.3,
     "max_tokens": 8192,
-    "languages": [
-      "zh",
-      "en"
-    ]
+    "languages": ["en"]
   },
   "sources": {
+    "hackernews": {
+      "enabled": true,
+      "fetch_top_stories": 30,
+      "min_score": 50
+    },
+    "rss": [
+      {
+        "name": "Simon Willison",
+        "url": "https://simonwillison.net/atom/everything/",
+        "enabled": true,
+        "category": "ai-ml"
+      },
+      {
+        "name": "Hugging Face Blog",
+        "url": "https://huggingface.co/blog/feed.xml",
+        "enabled": true,
+        "category": "ai-ml"
+      },
+      {
+        "name": "Anthropic News",
+        "url": "https://www.anthropic.com/news/rss.xml",
+        "enabled": true,
+        "category": "ai-ml"
+      },
+      {
+        "name": "LangChain Blog",
+        "url": "https://blog.langchain.dev/rss/",
+        "enabled": true,
+        "category": "ai-ml"
+      },
+      {
+        "name": "Lilian Weng",
+        "url": "https://lilianweng.github.io/index.xml",
+        "enabled": true,
+        "category": "ai-ml"
+      },
+      {
+        "name": "The Gradient",
+        "url": "https://thegradient.pub/rss/",
+        "enabled": true,
+        "category": "ai-ml"
+      },
+      {
+        "name": "Sebastian Ruder NLP News",
+        "url": "https://newsletter.ruder.io/feed",
+        "enabled": true,
+        "category": "nlp"
+      },
+      {
+        "name": "arXiv NLP+Agents (filtered)",
+        "url": "https://export.arxiv.org/api/query?search_query=cat:cs.CL+AND+(abs:agent+OR+abs:multi-agent+OR+abs:Greek+OR+abs:multilingual+OR+abs:tool+use+OR+abs:orchestration+OR+abs:LLM+serving+OR+abs:inference+OR+abs:CrewAI+OR+abs:AutoGen+OR+abs:Letta+OR+abs:MemGPT)&sortBy=submittedDate&max_results=30",
+        "enabled": true,
+        "category": "nlp"
+      },
+      {
+        "name": "CNCF Blog",
+        "url": "https://www.cncf.io/blog/feed/",
+        "enabled": true,
+        "category": "cloud-native"
+      },
+      {
+        "name": "Kubernetes Blog",
+        "url": "https://kubernetes.io/feed.xml",
+        "enabled": true,
+        "category": "cloud-native"
+      },
+      {
+        "name": "Upbound Blog (Crossplane)",
+        "url": "https://blog.upbound.io/rss.xml",
+        "enabled": true,
+        "category": "cloud-native"
+      },
+      {
+        "name": "dotAI Blog",
+        "url": "https://www.dotai.com/blog-feed.xml",
+        "enabled": true,
+        "category": "competitors"
+      },
+      {
+        "name": "X/Twitter — AI & K8s List",
+        "url": "https://rsshub.app/twitter/list/2044051139583201530",
+        "enabled": true,
+        "category": "social"
+      },
+      {
+        "name": "GitHub Trending - All Languages",
+        "url": "https://mshibanami.github.io/GitHubTrendingRSS/daily/all.xml",
+        "enabled": true,
+        "category": "trending"
+      },
+      {
+        "name": "GitHub Trending - Python",
+        "url": "https://mshibanami.github.io/GitHubTrendingRSS/daily/python.xml",
+        "enabled": true,
+        "category": "trending"
+      },
+      {
+        "name": "GitHub Trending - TypeScript",
+        "url": "https://mshibanami.github.io/GitHubTrendingRSS/daily/typescript.xml",
+        "enabled": true,
+        "category": "trending"
+      }
+    ],
+    "reddit": {
+      "enabled": false
+    },
+    "telegram": {
+      "enabled": false
+    },
     "github": [
       {
-        "type": "user_events",
-        "username": "karpathy",
+        "type": "repo_releases",
+        "owner": "langchain-ai",
+        "repo": "langgraph",
+        "enabled": true
+      },
+      {
+        "type": "repo_releases",
+        "owner": "kubernetes",
+        "repo": "kubernetes",
+        "enabled": true
+      },
+      {
+        "type": "repo_releases",
+        "owner": "huggingface",
+        "repo": "transformers",
         "enabled": true
       },
       {
@@ -27,78 +145,72 @@
       },
       {
         "type": "repo_releases",
-        "owner": "sgl-project",
-        "repo": "sglang",
+        "owner": "ollama",
+        "repo": "ollama",
         "enabled": true
       },
       {
         "type": "repo_releases",
-        "owner": "triton-lang",
-        "repo": "triton",
+        "owner": "modelcontextprotocol",
+        "repo": "specification",
+        "enabled": true
+      },
+      {
+        "type": "repo_releases",
+        "owner": "crossplane",
+        "repo": "crossplane",
+        "enabled": true
+      },
+      {
+        "type": "repo_releases",
+        "owner": "argoproj",
+        "repo": "argo-workflows",
+        "enabled": true
+      },
+      {
+        "type": "repo_releases",
+        "owner": "mlflow",
+        "repo": "mlflow",
+        "enabled": true
+      },
+      {
+        "type": "repo_releases",
+        "owner": "syntasso",
+        "repo": "kratix",
+        "enabled": true
+      },
+      {
+        "type": "repo_releases",
+        "owner": "microsoft",
+        "repo": "autogen",
+        "enabled": true
+      },
+      {
+        "type": "repo_releases",
+        "owner": "crewAIInc",
+        "repo": "crewAI",
+        "enabled": true
+      },
+      {
+        "type": "repo_releases",
+        "owner": "letta-ai",
+        "repo": "letta",
         "enabled": true
       }
-    ],
-    "hackernews": {
-      "enabled": true,
-      "fetch_top_stories": 10,
-      "min_score": 200
-    },
-    "rss": [
-      {
-        "name": "Simon Willison",
-        "url": "https://simonwillison.net/atom/everything/",
-        "enabled": true,
-        "category": "ai-tools"
-      },
-      {
-        "name": "GitHub Trending - Daily",
-        "url": "https://mshibanami.github.io/GitHubTrendingRSS/daily/all.xml",
-        "enabled": true,
-        "category": "github-trending"
-      },
-      {
-        "name": "LWN.net",
-        "url": "https://lwn.net/headlines/full_text?key=${LWN_KEY}",
-        "enabled": true,
-        "category": "linux-kernel"
-      }
-    ],
-    "reddit": {
-      "enabled": true,
-      "subreddits": [
-        {
-          "subreddit": "MachineLearning",
-          "enabled": true,
-          "sort": "hot",
-          "time_filter": "day",
-          "fetch_limit": 15,
-          "min_score": 60
-        },
-        {
-          "subreddit": "LocalLLaMA",
-          "enabled": true,
-          "sort": "hot",
-          "time_filter": "day",
-          "fetch_limit": 15,
-          "min_score": 60
-        }
-      ],
-      "users": [],
-      "fetch_comments": 10
-    },
-    "telegram": {
-      "enabled": true,
-      "channels": [
-        {
-          "channel": "zaihuapd",
-          "enabled": true,
-          "fetch_limit": 20
-        }
-      ]
-    }
+    ]
   },
   "filtering": {
-    "ai_score_threshold": 7.0,
-    "time_window_hours": 24
+    "ai_score_threshold": 6.0,
+    "time_window_hours": 96
+  },
+  "notification": {
+    "enabled": true,
+    "smtp_server": "smtp.gmail.com",
+    "smtp_port": 465,
+    "email_address": "apostolopoulou@novelcore.eu",
+    "password_env": "SMTP_PASSWORD",
+    "recipients": ["apostolopoulou@novelcore.eu"],
+    "notify_threshold": 8.0,
+    "pages_url": "https://alexa-aposto.github.io/tech-radar/"
   }
 }

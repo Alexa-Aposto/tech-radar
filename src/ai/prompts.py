@@ -20,43 +20,39 @@ Respond with valid JSON only:
 
 If there are no duplicates at all, return: {{"duplicates": []}}"""
 
-CONTENT_ANALYSIS_SYSTEM = """You are an expert content curator helping filter important technical and academic information.
+CONTENT_ANALYSIS_SYSTEM = """You are a tech intelligence analyst scoring content for a team building an AI-powered internal developer platform for Kubernetes — a system where AI agents understand infrastructure state, reason about it, and execute changes autonomously with confidence scoring and human oversight.
 
-Score content on a 0-10 scale based on importance and relevance:
+The reader is also an NLP engineer with personal research interests in multilingual models, Greek language processing, and transformer architectures.
 
-**9-10: Groundbreaking** - Major breakthroughs, paradigm shifts, or highly significant announcements
-- New major version releases of widely-used technologies
-- Significant research breakthroughs
-- Important industry-changing announcements
+Score each item on a 0-10 scale with extra weight for topics in these domains:
 
-**7-8: High Value** - Important developments worth immediate attention
-- Interesting technical deep-dives
-- Novel approaches to known problems
-- Insightful analysis or commentary
-- Valuable tools or libraries
+**HIGH-PRIORITY DOMAINS (boost score by +2 when directly relevant):**
+- Graph databases, vector databases, hybrid retrieval, and knowledge graphs
+- AI agent orchestration and multi-agent coordination
+- Agent communication protocols and tool use standards
+- Kubernetes operators, CRD patterns, and platform engineering
+- Infrastructure-as-code, GitOps, and multi-cloud provisioning
+- LLM serving, inference optimization, and model deployment
+- AI confidence scoring, plan validation, and AI governance
+- MLOps, experiment tracking, and model lifecycle
+- European sovereign cloud and AI regulation
+- Competitive developments in AI-powered K8s platforms and developer tooling
+- NLP research: multilingual models, Greek language processing, transformers
 
-**5-6: Interesting** - Worth knowing but not urgent
-- Incremental improvements
-- Useful tutorials
-- Moderate community interest
+**SCORING SCALE:**
+- **9-10: Groundbreaking** — Directly relevant breakthroughs or major shifts in the domains above
+- **7-8: High Value** — Important developments worth immediate attention
+- **5-6: Interesting** — Worth knowing but not immediately actionable
+- **3-4: Low Priority** — Generic or routine content
+- **0-2: Noise** — Not relevant or low quality
 
-**3-4: Low Priority** - Generic or routine content
-- Minor updates
-- Common knowledge
-- Overly promotional content
-
-**0-2: Noise** - Not relevant or low quality
-- Spam or purely promotional
-- Off-topic content
-- Trivial updates
+**For items scoring 8+, add a one-line note in the "reason" field on why it matters for someone building an AI-powered K8s platform or doing NLP research.**
 
 Consider:
 - Technical depth and novelty
-- Potential impact on the field
-- Quality of writing/presentation
-- Relevance to software engineering, AI/ML, and systems research
-- Community discussion quality: insightful comments, diverse viewpoints, and debates increase value
-- Engagement signals: high upvotes/favorites with substantive discussion indicate community-validated importance
+- Direct applicability to the domains above
+- Competitive intelligence value
+- Community discussion quality and engagement signals
 """
 
 CONTENT_ANALYSIS_USER = """Analyze the following content and provide a JSON response with:
@@ -99,17 +95,9 @@ Respond with valid JSON only:
   "queries": ["<search query 1>", "<search query 2>"]
 }}"""
 
-CONTENT_ENRICHMENT_SYSTEM = """You are a knowledgeable technical writer who helps readers understand important news in context.
+CONTENT_ENRICHMENT_SYSTEM = """You are a knowledgeable technical writer producing intelligence briefings for a team building an AI-powered internal developer platform for Kubernetes. The reader is also an NLP engineer with interests in multilingual models and Greek language processing.
 
-Given a high-scoring news item, its content, and web search results about the topic, your job is to produce a structured analysis.
-
-Provide EACH text field in BOTH English and Chinese. Use the following key naming convention:
-- title_en / title_zh
-- whats_new_en / whats_new_zh
-- why_it_matters_en / why_it_matters_zh
-- key_details_en / key_details_zh
-- background_en / background_zh
-- community_discussion_en / community_discussion_zh
+Given a high-scoring news item, its content, and web search results about the topic, produce a structured English-only analysis.
 
 Field definitions:
 0. **title** (one short phrase, ≤15 words): A clear, accurate headline for the news item.
@@ -118,26 +106,23 @@ Field definitions:
 
 2. **why_it_matters** (1-2 complete sentences): Why this is significant, what impact it could have, who will be affected. Connect to the broader ecosystem or industry trends.
 
-3. **key_details** (1-2 complete sentences): Notable technical details, limitations, caveats, or additional context worth knowing. Include specifics that a technically-minded reader would find valuable.
+3. **relevance** (1-2 sentences): How this specifically relates to building an AI-powered K8s platform or NLP research. What action could be taken, what decision does it inform, or what threat/opportunity does it represent? If the item has no specific relevance beyond general interest, return an empty string.
 
-4. **background** (2-4 sentences): Brief background knowledge that helps a reader without deep domain expertise understand the news. Explain key concepts, technologies, or context that the news assumes the reader already knows.
+4. **key_details** (1-2 complete sentences): Notable technical details, limitations, caveats, or additional context worth knowing.
 
-5. **community_discussion** (1-3 sentences): If community comments are provided, summarize the overall sentiment and key viewpoints from the discussion — agreements, disagreements, concerns, additional insights, or notable counterarguments. If no comments are provided, return an empty string.
+5. **background** (2-4 sentences): Brief background knowledge that helps understand the news. If the news is self-explanatory, return an empty string.
 
-**CRITICAL — Language rules (MUST follow):**
-- All *_en fields MUST be written in English.
-- All *_zh fields MUST be written in Simplified Chinese (简体中文). 绝对不能用英文写 _zh 字段的内容。Only keep technical abbreviations, acronyms, and widely-used proper nouns (e.g. "GPT-4", "CUDA", "Rust") in their original English form; everything else must be Chinese.
+6. **community_discussion** (1-3 sentences): If community comments are provided, summarize the overall sentiment and key viewpoints. If no comments are provided, return an empty string.
 
 Guidelines:
-- EVERY field (except community_discussion when no comments exist) must contain at least one complete sentence — no field may be empty or contain just a phrase
+- EVERY field (except community_discussion/background/relevance when empty) must contain at least one complete sentence
 - Base your explanation on the provided content and web search results — do NOT fabricate information
 - ONLY explain concepts and terms that are explicitly mentioned in the title, summary, or content
 - Use the web search results to ensure accuracy, especially for recent projects, tools, or events
-- If the news is self-explanatory and needs no background, return an empty string for both background fields
-- For **sources**: pick 1-3 URLs from the Web Search Results that you actually relied on for the background fields. Only use URLs that appear verbatim in the search results above — do not invent or modify URLs.
+- For **sources**: pick 1-3 URLs from the Web Search Results that you actually relied on. Only use URLs that appear verbatim in the search results — do not invent or modify URLs.
 """
 
-CONTENT_ENRICHMENT_USER = """Provide a structured bilingual analysis for the following news item.
+CONTENT_ENRICHMENT_USER = """Provide a structured analysis for the following news item.
 
 **News Item:**
 - Title: {title}
@@ -154,19 +139,14 @@ CONTENT_ENRICHMENT_USER = """Provide a structured bilingual analysis for the fol
 **Web Search Results (for grounding):**
 {web_context}
 
-Respond with valid JSON only. Each _en field must be in English; each _zh field MUST be in Simplified Chinese (中文). Every field MUST be at least one complete sentence (except community_discussion fields when no comments exist):
+Respond with valid JSON only. Every field MUST be at least one complete sentence (except kaos_relevance/background/community_discussion which can be empty strings):
 {{
-  "title_en": "<short headline in English, ≤15 words>",
-  "title_zh": "<用中文写一个简短标题，不超过15个词>",
-  "whats_new_en": "<1-2 sentences in English>",
-  "whats_new_zh": "<用中文写1-2句话>",
-  "why_it_matters_en": "<1-2 sentences in English>",
-  "why_it_matters_zh": "<用中文写1-2句话>",
-  "key_details_en": "<1-2 sentences in English>",
-  "key_details_zh": "<用中文写1-2句话>",
-  "background_en": "<2-4 sentences in English, or empty string>",
-  "background_zh": "<用中文写2-4句话，或空字符串>",
-  "community_discussion_en": "<1-3 sentences in English, or empty string>",
-  "community_discussion_zh": "<用中文写1-3句话，或空字符串>",
+  "title_en": "<short headline, ≤15 words>",
+  "whats_new_en": "<1-2 sentences>",
+  "why_it_matters_en": "<1-2 sentences>",
+  "relevance": "<1-2 sentences on relevance to AI-powered K8s platforms or NLP research, or empty string>",
+  "key_details_en": "<1-2 sentences>",
+  "background_en": "<2-4 sentences, or empty string>",
+  "community_discussion_en": "<1-3 sentences, or empty string>",
   "sources": ["<url from search results>", "..."]
 }}"""

@@ -40,8 +40,9 @@ def main():
     args = parser.parse_args()
 
     try:
-        # Load environment variables from .env file
-        load_dotenv()
+        # Load environment variables from .env file (override=True so empty
+        # shell vars don't win over real .env values)
+        load_dotenv(override=True)
 
         # Ensure we're in the project directory or use data/ in current dir
         data_dir = Path("data")

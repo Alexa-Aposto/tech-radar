@@ -147,6 +147,18 @@ class EmailConfig(BaseModel):
     enabled: bool = False
 
 
+class NotificationConfig(BaseModel):
+    """Threshold-gated email notification. Only sends when items score above notify_threshold."""
+    enabled: bool = False
+    smtp_server: str = "smtp.gmail.com"
+    smtp_port: int = 465
+    email_address: str = ""
+    password_env: str = "SMTP_PASSWORD"
+    recipients: List[str] = Field(default_factory=list)
+    notify_threshold: float = 8.0
+    pages_url: str = ""
+
+
 class FilteringConfig(BaseModel):
     """Content filtering configuration."""
 
@@ -162,3 +174,4 @@ class Config(BaseModel):
     sources: SourcesConfig
     filtering: FilteringConfig
     email: Optional[EmailConfig] = None
+    notification: Optional[NotificationConfig] = None

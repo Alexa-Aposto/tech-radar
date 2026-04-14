@@ -11,6 +11,7 @@ from rich.console import Console
 from .models import Config, ContentItem
 from .storage.manager import StorageManager
 from .services.emailer import EmailManager
+from .services.notifier import send_notification
 from .scrapers.github import GitHubScraper
 from .scrapers.hackernews import HackerNewsScraper
 from .scrapers.rss import RSSScraper
@@ -159,6 +160,14 @@ class HorizonOrchestrator:
                     subscribers = self.storage.load_subscribers()
                     subject = f"Horizon Summary ({lang.upper()}) - {today}"
                     self.email_manager.send_daily_summary(summary, subject, subscribers)
+
+            # 8. Send threshold-gated notification email
+            if self.config.notification and self.config.notification.enabled:
+                sent = send_notification(self.config.notification, important_items, today)
+                if sent:
+                    self.console.print("📬 Notification email sent\n")
+                else:
+                    self.console.print("[dim]📭 No items above notification threshold — no email sent[/dim]\n")
 
             self.console.print("[bold green]✅ Horizon completed successfully![/bold green]")
             usage = get_usage_snapshot()

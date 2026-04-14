@@ -1,9 +1,10 @@
-name: Daily Horizon Summary
+name: Horizon Tech Radar
 
 on:
-  # schedule:
-  #   - cron: '0 0 */2 * *'  # Runs every 2 days at 00:00 UTC
-  workflow_dispatch:      # Allow manual trigger
+  schedule:
+    - cron: '0 6 * * 1'   # Monday 06:00 UTC = 09:00 Athens (EEST)
+    - cron: '0 14 * * 5'  # Friday 14:00 UTC = 17:00 Athens (EEST)
+  workflow_dispatch:       # Allow manual trigger
 
 jobs:
   daily-summary:
@@ -30,11 +31,9 @@ jobs:
         env:
           # Map secrets to environment variables expected by config.json
           # Modify these based on your config.json provider settings
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          LWN_KEY: ${{ secrets.LWN_KEY }}
-        run: uv run horizon --hours 48
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        run: uv run horizon --hours 96
 
       - name: Set current date as environment variable
         run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
@@ -45,6 +44,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
           keep_files: true  # Keep existing summaries on gh-pages branch
-          commit_message: "📝 Daily Summary: ${{ env.DATE }}"
+          commit_message: "📝 Tech Radar: ${{ env.DATE }}"
           publish_branch: gh-pages
           enable_jekyll: true
