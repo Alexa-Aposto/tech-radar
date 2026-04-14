@@ -32,7 +32,9 @@ jobs:
           # Map secrets to environment variables expected by config.json
           # Modify these based on your config.json provider settings
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          SMTP_EMAIL: ${{ secrets.SMTP_EMAIL }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          SMTP_RECIPIENTS: ${{ secrets.SMTP_RECIPIENTS }}
         run: uv run horizon --hours 96
 
       - name: Set current date as environment variable

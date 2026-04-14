@@ -152,9 +152,9 @@ class NotificationConfig(BaseModel):
     enabled: bool = False
     smtp_server: str = "smtp.gmail.com"
     smtp_port: int = 465
-    email_address: str = ""
+    email_address_env: str = "SMTP_EMAIL"
     password_env: str = "SMTP_PASSWORD"
-    recipients: List[str] = Field(default_factory=list)
+    recipients_env: str = "SMTP_RECIPIENTS"
     notify_threshold: float = 8.0
     pages_url: str = ""
 

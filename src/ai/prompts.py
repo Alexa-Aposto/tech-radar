@@ -139,7 +139,7 @@ CONTENT_ENRICHMENT_USER = """Provide a structured analysis for the following new
 **Web Search Results (for grounding):**
 {web_context}
 
-Respond with valid JSON only. Every field MUST be at least one complete sentence (except kaos_relevance/background/community_discussion which can be empty strings):
+Respond with valid JSON only. Every field MUST be at least one complete sentence (except relevance/background/community_discussion which can be empty strings):
 {{
   "title_en": "<short headline, ≤15 words>",
   "whats_new_en": "<1-2 sentences>",

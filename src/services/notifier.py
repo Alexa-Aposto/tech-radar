@@ -21,12 +21,16 @@ def send_notification(
 
     Returns True if email was sent, False otherwise.
     """
-    if not config.enabled or not config.recipients:
+    email_address = os.getenv(config.email_address_env, "")
+    password = os.getenv(config.password_env, "")
+    recipients_raw = os.getenv(config.recipients_env, "")
+    recipients = [r.strip() for r in recipients_raw.split(",") if r.strip()]
+
+    if not config.enabled or not recipients:
         return False
 
-    password = os.getenv(config.password_env)
-    if not password:
-        logger.warning(f"Env var {config.password_env} not set, skipping notification")
+    if not password or not email_address:
+        logger.warning("SMTP email or password env vars not set, skipping notification")
         return False
 
     hot = [i for i in all_items if (i.ai_score or 0) >= config.notify_threshold]
@@ -91,11 +95,11 @@ def send_notification(
 
     try:
         with smtplib.SMTP_SSL(config.smtp_server, config.smtp_port) as server:
-            server.login(config.email_address, password)
-            for recipient in config.recipients:
+            server.login(email_address, password)
+            for recipient in recipients:
                 msg = MIMEMultipart("alternative")
                 msg["Subject"] = subject
-                msg["From"] = f"Horizon <{config.email_address}>"
+                msg["From"] = f"Horizon <{email_address}>"
                 msg["To"] = recipient
                 msg.attach(MIMEText(text_body, "plain", "utf-8"))
                 msg.attach(MIMEText(html_body, "html", "utf-8"))

@@ -207,9 +207,9 @@
     "enabled": true,
     "smtp_server": "smtp.gmail.com",
     "smtp_port": 465,
-    "email_address": "apostolopoulou@novelcore.eu",
+    "email_address_env": "SMTP_EMAIL",
     "password_env": "SMTP_PASSWORD",
-    "recipients": ["apostolopoulou@novelcore.eu"],
+    "recipients_env": "SMTP_RECIPIENTS",
     "notify_threshold": 8.0,
     "pages_url": "https://alexa-aposto.github.io/tech-radar/"
   }
