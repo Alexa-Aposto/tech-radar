@@ -92,15 +92,15 @@ def send_notification(
 </div>
 </body></html>"""
 
-    subject = f"☀️ Tech Radar — {date}"
+    subject = f"Tech Radar - {date}"
 
     try:
         with smtplib.SMTP_SSL(config.smtp_server, config.smtp_port) as server:
             server.login(email_address, password)
             for recipient in recipients:
                 msg = MIMEMultipart("alternative")
-                msg["Subject"] = Header(subject, "utf-8")
-                msg["From"] = f"Horizon <{email_address}>"
+                msg["Subject"] = subject
+                msg["From"] = f"Tech Radar <{email_address}>"
                 msg["To"] = recipient
                 msg.attach(MIMEText(text_body, "plain", "utf-8"))
                 msg.attach(MIMEText(html_body, "html", "utf-8"))
